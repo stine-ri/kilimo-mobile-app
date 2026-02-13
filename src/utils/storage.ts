@@ -1,17 +1,32 @@
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// API URL 
-export const API_URL = 'http://192.168.100.4:3000';
-
-export const api = axios.create({
-  baseURL: API_URL,
-});
-
-// Add token to requests 
-export const setAuthToken = (token: string) => {
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-};
-
-export const clearAuthToken = () => {
-  delete api.defaults.headers.common['Authorization'];
+export const storage = {
+  setToken: async (token: string) => {
+    await AsyncStorage.setItem('token', token);
+  },
+  
+  getToken: async () => {
+    return await AsyncStorage.getItem('token');
+  },
+  
+  removeToken: async () => {
+    await AsyncStorage.removeItem('token');
+  },
+  
+  setUser: async (user: any) => {
+    await AsyncStorage.setItem('user', JSON.stringify(user));
+  },
+  
+  getUser: async () => {
+    const user = await AsyncStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  },
+  
+  removeUser: async () => {
+    await AsyncStorage.removeItem('user');
+  },
+  
+  clearAll: async () => {
+    await AsyncStorage.multiRemove(['token', 'user']);
+  },
 };
