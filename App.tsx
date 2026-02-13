@@ -18,13 +18,11 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API URL 
-const API_URL = 'http://192.168.100.4:3000';// For now, I'll use localhost
-// When I deploy: const API_URL = 'https://your-app.onrender.com/api';
+const API_URL = 'http://192.168.100.4:3000';
 
 const Stack = createStackNavigator();
 
 // ============ LOGIN SCREEN ============
-
 function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +31,8 @@ function LoginScreen({ navigation }: any) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState(''); // Track unverified user
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -57,9 +56,8 @@ function LoginScreen({ navigation }: any) {
       
       if (response.data.success) {
         if (isRegistering) {
-          // Registration successful - go to OTP screen
           Alert.alert(
-            '✅ Registration Successful', 
+            'Registration Successful', 
             'We sent a 6-digit OTP to your email. Please verify to continue.',
             [
               {
@@ -69,12 +67,10 @@ function LoginScreen({ navigation }: any) {
             ]
           );
         } else {
-          // Login response
           if (response.data.requiresOTP) {
-            // User not verified - show OTP prompt
             setUnverifiedEmail(email);
             Alert.alert(
-              '📱 Account Not Verified', 
+              'Account Not Verified', 
               'Please verify your email address with the OTP we sent.',
               [
                 {
@@ -88,7 +84,6 @@ function LoginScreen({ navigation }: any) {
               ]
             );
           } else {
-            // Verified user - login successful
             await AsyncStorage.setItem('token', response.data.data.token);
             await AsyncStorage.setItem('user', JSON.stringify(response.data.data.user));
             navigation.reset({
@@ -109,113 +104,175 @@ function LoginScreen({ navigation }: any) {
     try {
       const response = await axios.post(`${API_URL}/api/auth/resend-otp`, { email });
       if (response.data.success) {
-        Alert.alert('✅ OTP Sent', 'Check your email for the new verification code');
+        Alert.alert('OTP Sent', 'Check your email for the new verification code');
       }
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to resend OTP');
     }
   };
 
-  return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+return (
+  <KeyboardAvoidingView 
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={styles.container}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+  >
+    <ScrollView 
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      bounces={false}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-     <Image 
-    source={require('./assets/plantimage.png')}
-    style={styles.logo}
-    resizeMode="contain"
-  />
-  <Text style={styles.title}>Kilimo</Text>
-          <Text style={styles.subtitle}>Your Farming Assistant</Text>
-        </View>
+      <View style={styles.header}>
+        <Image 
+          source={require('./assets/plantimage.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Kilimo</Text>
+        <Text style={styles.subtitle}>Your Farming Assistant</Text>
+      </View>
 
-        <View style={styles.form}>
-          {isRegistering && (
-            <>
+      <View style={styles.form}>
+        {isRegistering && (
+          <>
+            <View style={styles.inputContainer}>
+              <Image 
+                source={require('./assets/user-icon.png')}
+                style={styles.inputIcon}
+                resizeMode="contain"
+              />
               <TextInput
-                style={styles.input}
+                style={styles.inputWithIcon}
                 placeholder="First Name"
                 value={firstName}
                 onChangeText={setFirstName}
               />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Image 
+                source={require('./assets/user-icon.png')}
+                style={styles.inputIcon}
+                resizeMode="contain"
+              />
               <TextInput
-                style={styles.input}
+                style={styles.inputWithIcon}
                 placeholder="Last Name"
                 value={lastName}
                 onChangeText={setLastName}
               />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Image 
+                source={require('./assets/phone-icon.png')}
+                style={styles.inputIcon}
+                resizeMode="contain"
+              />
               <TextInput
-                style={styles.input}
+                style={styles.inputWithIcon}
                 placeholder="Phone Number"
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 keyboardType="phone-pad"
               />
-            </>
-          )}
+            </View>
+          </>
+        )}
 
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/email-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/shield-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!showPassword}
           />
-
           <TouchableOpacity 
-            style={styles.button}
-            onPress={handleAuth}
-            disabled={loading}
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIconContainer}
           >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>
-                {isRegistering ? 'Register' : 'Login'}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          {/* Show OTP button if user is unverified */}
-          {unverifiedEmail ? (
-            <TouchableOpacity 
-              style={styles.otpButton}
-              onPress={() => navigation.navigate('OTP', { email: unverifiedEmail })}
-            >
-              <Text style={styles.otpButtonText}>
-                🔑 I have an OTP - Enter Code
-              </Text>
-            </TouchableOpacity>
-          ) : null}
-
-          <TouchableOpacity 
-            onPress={() => {
-              setIsRegistering(!isRegistering);
-              setUnverifiedEmail(''); // Clear unverified state when switching modes
-            }}
-          >
-            <Text style={styles.linkText}>
-              {isRegistering 
-                ? 'Already have an account? Login' 
-                : "Don't have an account? Register"}
-            </Text>
+            <Image 
+              source={showPassword 
+                ? require('./assets/eye-open-icon.png') 
+                : require('./assets/eye-closed-icon.png')
+              }
+              style={styles.eyeIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={handleAuth}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.buttonText}>
+              {isRegistering ? 'Register' : 'Login'}
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {unverifiedEmail ? (
+          <TouchableOpacity 
+            style={styles.otpButton}
+            onPress={() => navigation.navigate('OTP', { email: unverifiedEmail })}
+          >
+            <Image 
+              source={require('./assets/key-icon.png')}
+              style={styles.buttonIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.otpButtonText}>
+              I have an OTP - Enter Code
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+
+        <TouchableOpacity 
+          style={styles.linkContainer}
+          onPress={() => {
+            setIsRegistering(!isRegistering);
+            setUnverifiedEmail('');
+            setShowPassword(false); // Reset password visibility when switching
+          }}
+        >
+          <Text style={styles.linkText}>
+            {isRegistering 
+              ? 'Already have an account? Login' 
+              : "Don't have an account? Register"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 }
 
 // ============ OTP SCREEN ============
@@ -226,9 +283,8 @@ function OTPScreen({ route, navigation }: any) {
   const { email } = route.params;
 
   useEffect(() => {
-    // Show instructions when screen loads
     Alert.alert(
-      '📧 Check Your Email',
+      'Check Your Email',
       `We sent a 6-digit code to ${email}. Please enter it below.`,
       [{ text: 'OK' }]
     );
@@ -268,7 +324,7 @@ function OTPScreen({ route, navigation }: any) {
         await AsyncStorage.setItem('user', JSON.stringify(response.data.data.user));
         
         Alert.alert(
-          '🎉 Verification Successful!', 
+          'Verification Successful', 
           'Your account has been verified. Welcome to Kilimo!',
           [
             {
@@ -293,7 +349,7 @@ function OTPScreen({ route, navigation }: any) {
       const response = await axios.post(`${API_URL}/api/auth/resend-otp`, { email });
       if (response.data.success) {
         setTimeLeft(120);
-        Alert.alert('✅ Code Sent', 'A new verification code has been sent to your email');
+        Alert.alert('Code Sent', 'A new verification code has been sent to your email');
       }
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to resend OTP');
@@ -303,25 +359,44 @@ function OTPScreen({ route, navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.otpContainer}>
-        <Text style={styles.title}>📱 Verify Your Email</Text>
+        <Image 
+          source={require('./assets/plantimage.png')}
+          style={styles.smallLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Verify Your Email</Text>
         <Text style={styles.subtitle}>
           Enter the 6-digit code sent to:
         </Text>
         <Text style={styles.emailText}>{email}</Text>
 
-        <TextInput
-          style={styles.otpInput}
-          placeholder="000000"
-          value={otp}
-          onChangeText={setOtp}
-          keyboardType="number-pad"
-          maxLength={6}
-          autoFocus={true}
-        />
+        <View style={styles.otpInputContainer}>
+          <Image 
+            source={require('./assets/key-icon.png')}
+            style={styles.otpIcon}
+            resizeMode="contain"
+          />
+          <TextInput
+            style={styles.otpInput}
+            placeholder="000000"
+            value={otp}
+            onChangeText={setOtp}
+            keyboardType="number-pad"
+            maxLength={6}
+            autoFocus={true}
+          />
+        </View>
 
-        <Text style={styles.timer}>
-          Code expires in: {formatTime(timeLeft)}
-        </Text>
+        <View style={styles.timerContainer}>
+          <Image 
+            source={require('./assets/clock-icon.png')}
+            style={styles.timerIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.timer}>
+            Code expires in: {formatTime(timeLeft)}
+          </Text>
+        </View>
 
         <TouchableOpacity 
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -336,19 +411,31 @@ function OTPScreen({ route, navigation }: any) {
         </TouchableOpacity>
 
         <TouchableOpacity 
+          style={styles.resendContainer}
           onPress={resendOTP}
           disabled={timeLeft > 0}
         >
+          <Image 
+            source={require('./assets/updated-icon.png')}
+            style={[styles.resendIcon, timeLeft > 0 && styles.disabledIcon]}
+            resizeMode="contain"
+          />
           <Text style={[styles.linkText, timeLeft > 0 && styles.disabledText]}>
             Didn't receive code? Resend
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
+          style={styles.backContainer}
           onPress={() => navigation.navigate('Login')}
         >
+          <Image 
+            source={require('./assets/back-icon.png')}
+            style={styles.backIcon}
+            resizeMode="contain"
+          />
           <Text style={styles.backToLoginText}>
-            ← Back to Login
+            Back to Login
           </Text>
         </TouchableOpacity>
       </View>
@@ -367,9 +454,9 @@ function FormScreen({ navigation }: any) {
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    // Load user data
     AsyncStorage.getItem('user').then((userData) => {
       if (userData) {
         const parsed = JSON.parse(userData);
@@ -386,7 +473,6 @@ function FormScreen({ navigation }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    // Validation
     if (!formData.firstName || !formData.lastName || !formData.email || 
         !formData.phoneNumber || !formData.message) {
       Alert.alert('Error', 'All fields are required');
@@ -419,7 +505,6 @@ function FormScreen({ navigation }: any) {
             {
               text: 'OK',
               onPress: () => {
-                // Clear form
                 setFormData({
                   ...formData,
                   message: ''
@@ -447,36 +532,72 @@ function FormScreen({ navigation }: any) {
     navigation.navigate('Login');
   };
 
-  return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+return (
+  <KeyboardAvoidingView 
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={styles.container}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+  >
+    <ScrollView 
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      bounces={false}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>📋 Farmer Form</Text>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.header}>
+        <Image 
+          source={require('./assets/plantimage.png')}
+          style={styles.smallLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Farmer Form</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutContainer}>
+          <Image 
+            source={require('./assets/logout-icon.png')}
+            style={styles.logoutIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.form}>
+      <View style={styles.form}>
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/user-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="First Name"
             value={formData.firstName}
             onChangeText={(text) => setFormData({...formData, firstName: text})}
           />
-          
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/user-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="Last Name"
             value={formData.lastName}
             onChangeText={(text) => setFormData({...formData, lastName: text})}
           />
-          
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/email-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="Email"
             value={formData.email}
             onChangeText={(text) => setFormData({...formData, email: text})}
@@ -484,17 +605,31 @@ function FormScreen({ navigation }: any) {
             autoCapitalize="none"
             editable={false}
           />
-          
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/phone-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={styles.input}
+            style={styles.inputWithIcon}
             placeholder="Phone Number"
             value={formData.phoneNumber}
             onChangeText={(text) => setFormData({...formData, phoneNumber: text})}
             keyboardType="phone-pad"
           />
-          
+        </View>
+        
+        <View style={styles.inputContainer}>
+          <Image 
+            source={require('./assets/chat-icon.png')}
+            style={styles.inputIcon}
+            resizeMode="contain"
+          />
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.inputWithIcon, styles.textArea]}
             placeholder="Message (minimum 10 characters)"
             value={formData.message}
             onChangeText={(text) => setFormData({...formData, message: text})}
@@ -502,22 +637,30 @@ function FormScreen({ navigation }: any) {
             numberOfLines={4}
             textAlignVertical="top"
           />
-
-          <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Submit Form</Text>
-            )}
-          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+
+        <TouchableOpacity 
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Image 
+                source={require('./assets/submit-icon.png')}
+                style={styles.buttonIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.buttonText}>Submit Form</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 }
 
 // ============ MAIN APP ============
@@ -552,6 +695,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
+    position: 'relative',
   },
   title: {
     fontSize: 32,
@@ -573,14 +717,26 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    padding: 12,
     marginBottom: 16,
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 10,
+  },
+  inputIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    tintColor: '#4CAF50',
+  },
+  inputWithIcon: {
+    flex: 1,
+    padding: 12,
     fontSize: 16,
-    backgroundColor: "#f5f5f5"
   },
   textArea: {
     height: 100,
@@ -592,50 +748,110 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   buttonDisabled: {
     backgroundColor: '#a5d6a7',
+  },
+  buttonIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    tintColor: 'white',
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
   },
+  linkContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
   linkText: {
     color: '#4CAF50',
     textAlign: 'center',
-    marginTop: 20,
     fontSize: 16,
   },
   otpContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
     backgroundColor: 'white',
   },
-  otpInput: {
+  otpInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: '#4CAF50',
     borderRadius: 8,
+    marginVertical: 30,
+    width: '100%',
+    paddingHorizontal: 15,
+  },
+  otpIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+    tintColor: '#4CAF50',
+  },
+  otpInput: {
+    flex: 1,
     padding: 15,
     fontSize: 24,
     textAlign: 'center',
     letterSpacing: 10,
-    marginVertical: 30,
+  },
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  timerIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 8,
+    tintColor: '#666',
   },
   timer: {
-    textAlign: 'center',
     fontSize: 18,
     color: '#666',
-    marginBottom: 20,
+  },
+  resendContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  resendIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 8,
+    tintColor: '#4CAF50',
+  },
+  disabledIcon: {
+    tintColor: '#999',
   },
   disabledText: {
     color: '#999',
   },
+  logoutContainer: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 5,
+    tintColor: '#f44336',
+  },
   logoutText: {
     color: '#f44336',
     fontSize: 16,
-    marginTop: 10,
   },
   otpButton: {
     backgroundColor: '#2196F3',
@@ -643,6 +859,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   otpButtonText: {
     color: 'white',
@@ -655,17 +873,42 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     marginTop: 10,
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  backContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  backIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 5,
+    tintColor: '#666',
   },
   backToLoginText: {
     color: '#666',
-    textAlign: 'center',
-    marginTop: 30,
     fontSize: 14,
     textDecorationLine: 'underline',
   },
-    logo: {
+  logo: {
     width: 80,
     height: 80,
     marginBottom: 10,
   },
+  smallLogo: {
+    width: 50,
+    height: 50,
+    marginBottom: 15,
+  },
+eyeIconContainer: {
+  padding: 10,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+eyeIcon: {
+  width: 22,
+  height: 22,
+  tintColor: '#666',
+},
 });
