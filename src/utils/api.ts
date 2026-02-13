@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API URL 
-export const API_URL = 'http://192.168.100.4:3000';
+export const API_URL = 'https://kilimo-backend-betv.onrender.com';
 
 export const api = axios.create({
   baseURL: API_URL,
