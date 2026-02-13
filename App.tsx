@@ -11,19 +11,20 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API URL 
-const API_URL = 'http://192.168.100.4:3000';// For now, we'll use localhost
-// When you deploy: const API_URL = 'https://your-app.onrender.com/api';
+const API_URL = 'http://192.168.100.4:3000';// For now, I'll use localhost
+// When I deploy: const API_URL = 'https://your-app.onrender.com/api';
 
 const Stack = createStackNavigator();
 
 // ============ LOGIN SCREEN ============
-// ============ LOGIN SCREEN (FIXED) ============
+
 function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -122,7 +123,12 @@ function LoginScreen({ navigation }: any) {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>🌱 Kilimo</Text>
+     <Image 
+    source={require('./assets/plantimage.png')}
+    style={styles.logo}
+    resizeMode="contain"
+  />
+  <Text style={styles.title}>Kilimo</Text>
           <Text style={styles.subtitle}>Your Farming Assistant</Text>
         </View>
 
@@ -631,30 +637,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
-otpButton: {
-  backgroundColor: '#2196F3',
-  padding: 12,
-  borderRadius: 8,
-  alignItems: 'center',
-  marginTop: 10,
-},
-otpButtonText: {
-  color: 'white',
-  fontSize: 16,
-  fontWeight: '600',
-},
-emailText: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#4CAF50',
-  marginTop: 10,
-  marginBottom: 20,
-},
-backToLoginText: {
-  color: '#666',
-  textAlign: 'center',
-  marginTop: 30,
-  fontSize: 14,
-  textDecorationLine: 'underline',
-},
+  otpButton: {
+    backgroundColor: '#2196F3',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  otpButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emailText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  backToLoginText: {
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 30,
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+    logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+  },
 });
