@@ -16,6 +16,7 @@ import { globalStyles } from '../constants/styles';
 import { API_URL } from '../utils/api';
 import { storage } from '../utils/storage';
 
+
 export default function FormScreen({ navigation }: any) {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -122,6 +123,16 @@ export default function FormScreen({ navigation }: any) {
             resizeMode="contain"
           />
           <Text style={globalStyles.title}>Farmer Form</Text>
+            <TouchableOpacity 
+                onPress={() => navigation.navigate('Submissions')}
+                style={styles.historyButton}
+            >
+               <Image 
+                 source={require('../../assets/history-icon.png')}
+                 style={styles.historyIcon}
+                 resizeMode="contain"
+                />
+           </TouchableOpacity>
           <TouchableOpacity onPress={handleLogout} style={globalStyles.logoutContainer}>
             <Image 
               source={require('../../assets/logout-icon.png')}
@@ -233,3 +244,22 @@ export default function FormScreen({ navigation }: any) {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = {
+  headerButtons: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    position: 'absolute' as const,
+    right: 0,
+    top: 0,
+  },
+  historyButton: {
+    marginRight: 15,
+    padding: 5,
+  },
+  historyIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#4CAF50',
+  },
+};
