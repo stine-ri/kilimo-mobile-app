@@ -33,6 +33,7 @@ function LoginScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -111,168 +112,211 @@ function LoginScreen({ navigation }: any) {
     }
   };
 
-return (
-  <KeyboardAvoidingView 
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    style={styles.container}
-    keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-  >
-    <ScrollView 
-      contentContainerStyle={styles.scrollContainer}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-      bounces={false}
+  const handleModeSwitch = () => {
+  // Show loading immediately
+  setIsSwitching(true);
+  
+  // Clear registration fields when switching to login
+  if (isRegistering) {
+    setFirstName('');
+    setLastName('');
+    setPhoneNumber('');
+  }
+  
+  setUnverifiedEmail('');
+  setShowPassword(false);
+  
+  // Small delay to show loading and allow smooth transition
+  setTimeout(() => {
+    setIsRegistering(!isRegistering);
+    setIsSwitching(false);
+  }, 300); // 300ms is smooth and noticeable but not annoying
+};
+
+  return (
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
     >
-      <View style={styles.header}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Image 
+            source={require('./assets/plantimage.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Kilimo</Text>
+          <Text style={styles.subtitle}>Your Farming Assistant</Text>
+        </View>
+
+       <View style={styles.form}>
+  {/* Show loading overlay when switching */}
+  {isSwitching ? (
+    <View style={styles.switchingContainer}>
+      <ActivityIndicator size="large" color="#4CAF50" />
+      <Text style={styles.switchingText}>
+        {isRegistering ? 'Switching to Login...' : 'Loading Registration...'}
+      </Text>
+    </View>
+  ) : (
+    <>
+      {/* REGISTRATION FIELDS - Only show when registering */}
+      {isRegistering && (
+        <>
+          <View style={styles.inputContainer}>
+            <Image 
+              source={require('./assets/user-icon.png')}
+              style={styles.inputIcon}
+              resizeMode="contain"
+            />
+            <TextInput
+              style={styles.inputWithIcon}
+              placeholder="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Image 
+              source={require('./assets/user-icon.png')}
+              style={styles.inputIcon}
+              resizeMode="contain"
+            />
+            <TextInput
+              style={styles.inputWithIcon}
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Image 
+              source={require('./assets/phone-icon.png')}
+              style={styles.inputIcon}
+              resizeMode="contain"
+            />
+            <TextInput
+              style={styles.inputWithIcon}
+              placeholder="Phone Number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              keyboardType="phone-pad"
+            />
+          </View>
+        </>
+      )}
+
+      {/* EMAIL FIELD - Always visible */}
+      <View style={styles.inputContainer}>
         <Image 
-          source={require('./assets/plantimage.png')}
-          style={styles.logo}
+          source={require('./assets/email-icon.png')}
+          style={styles.inputIcon}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Kilimo</Text>
-        <Text style={styles.subtitle}>Your Farming Assistant</Text>
+        <TextInput
+          style={styles.inputWithIcon}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+      
+      {/* PASSWORD FIELD - Always visible */}
+      <View style={styles.inputContainer}>
+        <Image 
+          source={require('./assets/shield-icon.png')}
+          style={styles.inputIcon}
+          resizeMode="contain"
+        />
+        <TextInput
+          style={styles.inputWithIcon}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <TouchableOpacity 
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIconContainer}
+          activeOpacity={0.7}
+        >
+          <Image 
+            source={showPassword 
+              ? require('./assets/eye-open-icon.png') 
+              : require('./assets/eye-closed-icon.png')
+            }
+            style={styles.eyeIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.form}>
-        {isRegistering && (
-          <>
-            <View style={styles.inputContainer}>
-              <Image 
-                source={require('./assets/user-icon.png')}
-                style={styles.inputIcon}
-                resizeMode="contain"
-              />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="First Name"
-                value={firstName}
-                onChangeText={setFirstName}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Image 
-                source={require('./assets/user-icon.png')}
-                style={styles.inputIcon}
-                resizeMode="contain"
-              />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Last Name"
-                value={lastName}
-                onChangeText={setLastName}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Image 
-                source={require('./assets/phone-icon.png')}
-                style={styles.inputIcon}
-                resizeMode="contain"
-              />
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Phone Number"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </>
+      {/* SUBMIT BUTTON */}
+      <TouchableOpacity 
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleAuth}
+        disabled={loading}
+        activeOpacity={0.7}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>
+            {isRegistering ? 'Register' : 'Login'}
+          </Text>
         )}
+      </TouchableOpacity>
 
-        <View style={styles.inputContainer}>
+      {/* OTP BUTTON - Only show for unverified users */}
+      {unverifiedEmail && !isRegistering ? (
+        <TouchableOpacity 
+          style={styles.otpButton}
+          onPress={() => navigation.navigate('OTP', { email: unverifiedEmail })}
+          activeOpacity={0.7}
+        >
           <Image 
-            source={require('./assets/email-icon.png')}
-            style={styles.inputIcon}
+            source={require('./assets/key-icon.png')}
+            style={styles.buttonIcon}
             resizeMode="contain"
           />
-          <TextInput
-            style={styles.inputWithIcon}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        
-        <View style={styles.inputContainer}>
-          <Image 
-            source={require('./assets/shield-icon.png')}
-            style={styles.inputIcon}
-            resizeMode="contain"
-          />
-          <TextInput
-            style={styles.inputWithIcon}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity 
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIconContainer}
-          >
-            <Image 
-              source={showPassword 
-                ? require('./assets/eye-open-icon.png') 
-                : require('./assets/eye-closed-icon.png')
-              }
-              style={styles.eyeIcon}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={handleAuth}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.buttonText}>
-              {isRegistering ? 'Register' : 'Login'}
-            </Text>
-          )}
-        </TouchableOpacity>
-
-        {unverifiedEmail ? (
-          <TouchableOpacity 
-            style={styles.otpButton}
-            onPress={() => navigation.navigate('OTP', { email: unverifiedEmail })}
-          >
-            <Image 
-              source={require('./assets/key-icon.png')}
-              style={styles.buttonIcon}
-              resizeMode="contain"
-            />
-            <Text style={styles.otpButtonText}>
-              I have an OTP - Enter Code
-            </Text>
-          </TouchableOpacity>
-        ) : null}
-
-        <TouchableOpacity 
-          style={styles.linkContainer}
-          onPress={() => {
-            setIsRegistering(!isRegistering);
-            setUnverifiedEmail('');
-            setShowPassword(false); // Reset password visibility when switching
-          }}
-        >
-          <Text style={styles.linkText}>
-            {isRegistering 
-              ? 'Already have an account? Login' 
-              : "Don't have an account? Register"}
+          <Text style={styles.otpButtonText}>
+            I have an OTP - Enter Code
           </Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
-  </KeyboardAvoidingView>
-);
+      ) : null}
+
+      {/* SWITCH MODE LINK */}
+      <TouchableOpacity 
+        style={styles.linkContainer}
+        onPress={handleModeSwitch}
+        activeOpacity={0.7}
+        disabled={isSwitching}
+      >
+        <Text style={[styles.linkText, isSwitching && styles.disabledText]}>
+          {isRegistering 
+            ? 'Already have an account? Login' 
+            : "Don't have an account? Register"}
+        </Text>
+      </TouchableOpacity>
+    </>
+  )}
+</View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
 
 // ============ OTP SCREEN ============
@@ -910,5 +954,17 @@ eyeIcon: {
   width: 22,
   height: 22,
   tintColor: '#666',
+},
+switchingContainer: {
+  padding: 40,
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 300,
+},
+switchingText: {
+  marginTop: 15,
+  fontSize: 16,
+  color: '#4CAF50',
+  fontWeight: '500',
 },
 });
