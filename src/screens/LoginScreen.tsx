@@ -6,8 +6,6 @@ import {
   TouchableOpacity, 
   Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Image
 } from 'react-native';
@@ -124,14 +122,12 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={globalStyles.container}
-    >
+    <View style={globalStyles.container}>
       <ScrollView 
         contentContainerStyle={globalStyles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        bounces={false}
       >
         <View style={globalStyles.header}>
           <Image 
@@ -164,6 +160,7 @@ export default function LoginScreen({ navigation }: any) {
                     <TextInput
                       style={globalStyles.inputWithIcon}
                       placeholder="First Name"
+                      placeholderTextColor="#999"
                       value={firstName}
                       onChangeText={setFirstName}
                       autoCapitalize="words"
@@ -179,6 +176,7 @@ export default function LoginScreen({ navigation }: any) {
                     <TextInput
                       style={globalStyles.inputWithIcon}
                       placeholder="Last Name"
+                      placeholderTextColor="#999"
                       value={lastName}
                       onChangeText={setLastName}
                       autoCapitalize="words"
@@ -194,6 +192,7 @@ export default function LoginScreen({ navigation }: any) {
                     <TextInput
                       style={globalStyles.inputWithIcon}
                       placeholder="Phone Number"
+                      placeholderTextColor="#999"
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
                       keyboardType="phone-pad"
@@ -211,6 +210,7 @@ export default function LoginScreen({ navigation }: any) {
                 <TextInput
                   style={globalStyles.inputWithIcon}
                   placeholder="Email"
+                  placeholderTextColor="#999"
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -228,6 +228,7 @@ export default function LoginScreen({ navigation }: any) {
                 <TextInput
                   style={globalStyles.inputWithIcon}
                   placeholder="Password"
+                  placeholderTextColor="#999"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -298,6 +299,6 @@ export default function LoginScreen({ navigation }: any) {
           )}
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

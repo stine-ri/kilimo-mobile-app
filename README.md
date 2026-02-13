@@ -236,7 +236,7 @@ Edit `src/utils/api.ts`:
 
 ```typescript
 // Development - Your local backend
-export const API_URL = 'http://192.168.100.4:3000';
+export const API_URL = 'https://kilimo-backend-betv.onrender.com/';
 
 // Production - Your deployed backend
 // export const API_URL = 'https://api.kilimo.com';
@@ -591,7 +591,7 @@ export const storage = {
 // src/utils/api.ts
 import axios from 'axios';
 
-export const API_URL = 'http://192.168.100.4:3000';
+export const API_URL = 'https://kilimo-backend-betv.onrender.com/';
 
 export const api = axios.create({
   baseURL: API_URL,
