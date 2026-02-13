@@ -6,6 +6,7 @@ import OTPScreen from '../screens/OTPScreen';
 import FormScreen from '../screens/FormScreen';
 import SubmissionsScreen from '../screens/submissionsScreen';
 import SubmissionDetailScreen from '../screens/submissionDetailsScreen';
+import EditSubmissionScreen from '../screens/editSubmission'; 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -22,6 +23,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Form" component={FormScreen} />
         <Stack.Screen name="Submissions" component={SubmissionsScreen} />
         <Stack.Screen name="SubmissionDetail" component={SubmissionDetailScreen} />
+        <Stack.Screen name="EditSubmission" component={EditSubmissionScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

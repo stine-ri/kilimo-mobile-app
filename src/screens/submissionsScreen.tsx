@@ -95,7 +95,6 @@ export default function SubmissionsScreen({ navigation }: any) {
 
       if (response.data.success) {
         Alert.alert('Success', 'Submission deleted successfully');
-        // Remove from list
         setSubmissions(submissions.filter(s => s.id !== submissionId));
       }
     } catch (error: any) {
@@ -111,7 +110,7 @@ export default function SubmissionsScreen({ navigation }: any) {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }).replace(',', ' •'); // Replace comma with bullet for better readability
   };
 
   const renderSubmission = ({ item }: { item: Submission }) => (
@@ -137,16 +136,36 @@ export default function SubmissionsScreen({ navigation }: any) {
         </View>
       </TouchableOpacity>
       
-      <TouchableOpacity 
-        style={styles.deleteButton}
-        onPress={() => handleDelete(item.id)}
-      >
-        <Image 
-          source={require('../../assets/delete-icon.png')}
-          style={styles.deleteIcon}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity 
+          style={styles.editButton}
+          onPress={() => {
+            console.log('Navigating to EditSubmission with:', item.id);
+            navigation.navigate('EditSubmission', { submission: item });
+          }}
+        >
+          <Image 
+            source={require('../../assets/edit-icon.png')}
+            style={styles.actionIcon}
+            resizeMode="contain"
+            defaultSource={require('../../assets/edit-icon.png')} // Fallback
+          />
+          <Text style={styles.actionText}>Edit</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.deleteButton}
+          onPress={() => handleDelete(item.id)}
+        >
+          <Image 
+            source={require('../../assets/delete-icon.png')}
+            style={styles.actionIcon}
+            resizeMode="contain"
+            defaultSource={require('../../assets/delete-icon.png')} // Fallback
+          />
+          <Text style={[styles.actionText, styles.deleteText]}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -173,6 +192,7 @@ export default function SubmissionsScreen({ navigation }: any) {
             style={styles.backIcon}
             resizeMode="contain"
           />
+          <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Submissions</Text>
         <TouchableOpacity 
@@ -239,12 +259,19 @@ const styles = {
     color: '#4CAF50',
   },
   backButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
     padding: 10,
   },
   backIcon: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     tintColor: '#666',
+    marginRight: 5,
+  },
+  backText: {
+    fontSize: 14,
+    color: '#666',
   },
   newButton: {
     padding: 10,
@@ -258,7 +285,6 @@ const styles = {
     padding: 20,
   },
   submissionCard: {
-    flexDirection: 'row' as const,
     backgroundColor: 'white',
     borderRadius: 10,
     marginBottom: 15,
@@ -267,9 +293,9 @@ const styles = {
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    overflow: 'hidden' as const,
   },
   cardContent: {
-    flex: 1,
     padding: 15,
   },
   cardHeader: {
@@ -305,16 +331,39 @@ const styles = {
     color: '#2196F3',
     fontWeight: '500' as const,
   },
-  deleteButton: {
-    justifyContent: 'center' as const,
-    paddingHorizontal: 15,
-    borderLeftWidth: 1,
-    borderLeftColor: '#f0f0f0',
+  actionButtons: {
+    flexDirection: 'row' as const,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
   },
-  deleteIcon: {
-    width: 20,
-    height: 20,
-    tintColor: '#f44336',
+  editButton: {
+    flex: 1,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    padding: 12,
+    backgroundColor: '#f8f8f8',
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    padding: 12,
+    backgroundColor: '#fff0f0',
+  },
+  actionIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500' as const,
+  },
+  deleteText: {
+    color: '#f44336',
   },
   centerContainer: {
     flex: 1,

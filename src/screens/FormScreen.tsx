@@ -16,7 +16,6 @@ import { globalStyles } from '../constants/styles';
 import { API_URL } from '../utils/api';
 import { storage } from '../utils/storage';
 
-
 export default function FormScreen({ navigation }: any) {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -116,34 +115,44 @@ export default function FormScreen({ navigation }: any) {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <View style={globalStyles.header}>
-          <Image 
-            source={require('../../assets/plantimage.png')}
-            style={globalStyles.smallLogo}
-            resizeMode="contain"
-          />
-          <Text style={globalStyles.title}>Farmer Form</Text>
-            <TouchableOpacity 
-                onPress={() => navigation.navigate('Submissions')}
-                style={styles.historyButton}
-            >
-               <Image 
-                 source={require('../../assets/history-icon.png')}
-                 style={styles.historyIcon}
-                 resizeMode="contain"
-                />
-           </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout} style={globalStyles.logoutContainer}>
+        {/* Simple Header - No Card Container */}
+        <View style={styles.simpleHeader}>
+          <View style={styles.logoTitleRow}>
             <Image 
-              source={require('../../assets/logout-icon.png')}
-              style={globalStyles.logoutIcon}
+              source={require('../../assets/plantimage.png')}
+              style={globalStyles.smallLogo}
               resizeMode="contain"
             />
-            <Text style={globalStyles.logoutText}>Logout</Text>
-          </TouchableOpacity>
+            <Text style={globalStyles.title}>Farmer Form</Text>
+          </View>
+          
+          <View style={styles.actionButtonsRow}>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Submissions')}
+              style={styles.simpleHistoryButton}
+            >
+              <Image 
+                source={require('../../assets/history-icon.png')}
+                style={styles.simpleIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.simpleHistoryText}>History</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={handleLogout} style={styles.simpleLogoutButton}>
+              <Image 
+                source={require('../../assets/logout-icon.png')}
+                style={styles.simpleIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.simpleLogoutText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
+        {/* Form Section */}
         <View style={globalStyles.form}>
+          {/* First Name */}
           <View style={globalStyles.inputContainer}>
             <Image 
               source={require('../../assets/user-icon.png')}
@@ -153,11 +162,13 @@ export default function FormScreen({ navigation }: any) {
             <TextInput
               style={globalStyles.inputWithIcon}
               placeholder="First Name"
+              placeholderTextColor="#999"
               value={formData.firstName}
               onChangeText={(text) => setFormData({...formData, firstName: text})}
             />
           </View>
           
+          {/* Last Name */}
           <View style={globalStyles.inputContainer}>
             <Image 
               source={require('../../assets/user-icon.png')}
@@ -167,11 +178,13 @@ export default function FormScreen({ navigation }: any) {
             <TextInput
               style={globalStyles.inputWithIcon}
               placeholder="Last Name"
+              placeholderTextColor="#999"
               value={formData.lastName}
               onChangeText={(text) => setFormData({...formData, lastName: text})}
             />
           </View>
           
+          {/* Email (read-only) */}
           <View style={globalStyles.inputContainer}>
             <Image 
               source={require('../../assets/email-icon.png')}
@@ -179,8 +192,9 @@ export default function FormScreen({ navigation }: any) {
               resizeMode="contain"
             />
             <TextInput
-              style={globalStyles.inputWithIcon}
+              style={[globalStyles.inputWithIcon, { color: '#666' }]}
               placeholder="Email"
+              placeholderTextColor="#999"
               value={formData.email}
               onChangeText={(text) => setFormData({...formData, email: text})}
               keyboardType="email-address"
@@ -189,6 +203,7 @@ export default function FormScreen({ navigation }: any) {
             />
           </View>
           
+          {/* Phone Number */}
           <View style={globalStyles.inputContainer}>
             <Image 
               source={require('../../assets/phone-icon.png')}
@@ -198,12 +213,14 @@ export default function FormScreen({ navigation }: any) {
             <TextInput
               style={globalStyles.inputWithIcon}
               placeholder="Phone Number"
+              placeholderTextColor="#999"
               value={formData.phoneNumber}
               onChangeText={(text) => setFormData({...formData, phoneNumber: text})}
               keyboardType="phone-pad"
             />
           </View>
           
+          {/* Message */}
           <View style={globalStyles.inputContainer}>
             <Image 
               source={require('../../assets/chat-icon.png')}
@@ -213,6 +230,7 @@ export default function FormScreen({ navigation }: any) {
             <TextInput
               style={[globalStyles.inputWithIcon, globalStyles.textArea]}
               placeholder="Message (minimum 10 characters)"
+              placeholderTextColor="#999"
               value={formData.message}
               onChangeText={(text) => setFormData({...formData, message: text})}
               multiline
@@ -221,6 +239,7 @@ export default function FormScreen({ navigation }: any) {
             />
           </View>
 
+          {/* Submit Button */}
           <TouchableOpacity 
             style={[globalStyles.button, loading && globalStyles.buttonDisabled]}
             onPress={handleSubmit}
@@ -245,21 +264,55 @@ export default function FormScreen({ navigation }: any) {
   );
 }
 
+// Simple styles - no card container
 const styles = {
-  headerButtons: {
+  simpleHeader: {
+    flexDirection: 'column' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    width: '100%' as const,
+    paddingTop: 50,
+    paddingBottom: 30,
+    gap: 15,
+  },
+  logoTitleRow: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    position: 'absolute' as const,
-    right: 0,
-    top: 0,
+    justifyContent: 'center' as const,
+    gap: 10,
   },
-  historyButton: {
-    marginRight: 15,
-    padding: 5,
+  actionButtonsRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 20,
   },
-  historyIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#4CAF50',
+  simpleHistoryButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  simpleLogoutButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  simpleIcon: {
+    width: 18,
+    height: 18,
+  },
+  simpleHistoryText: {
+    fontSize: 16,
+    color: '#4CAF50',
+    fontWeight: '500' as const,
+  },
+  simpleLogoutText: {
+    fontSize: 16,
+    color: '#f44336',
+    fontWeight: '500' as const,
   },
 };
